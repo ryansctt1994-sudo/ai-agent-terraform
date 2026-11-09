@@ -14,6 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check CI inventory of Terraform roots
+        run: |
+          python3 scripts/check_terraform_roots.py
+          python3 -m unittest discover -s tests -p 'test_*.py' -v
       - uses: hashicorp/setup-terraform@v3.1.2
         with:
           terraform_version: 1.10.5
