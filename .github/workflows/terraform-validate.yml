@@ -1,31 +1,48 @@
-name: "Terraform Validation"
+name: Terraform Validation
 
 on:
   pull_request:
   push:
-    branches:
-      - main
-      - develop
+    branches: [main, develop]
+
+permissions:
+  contents: read
 
 jobs:
-  terraform:
-    name: "Terraform Syntax Check"
+  terraform-format:
+    name: Terraform formatting (all modules)
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Check CI inventory of Terraform roots
+        run: |
+          python3 scripts/check_terraform_roots.py
+          python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: 1.10.5
+      - name: Check formatting without modifying checkout
+        run: terraform fmt -check -recursive
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3.1.2
-      with:
-        terraform_version: 1.1.7
-
-    - name: Terraform Format Check
-      run: terraform fmt -check -recursive
-
-    - name: Terraform Init
-      run: terraform init
-
-    - name: Terraform Validate
-      run: terraform validate
+  terraform-validate:
+    name: Validate ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - accounts/mdupont
+          - environments/swarms-aws-agent-api/dev/us-east-1
+          - environments/swarms-aws-agent-api/dev/us-east-1/components/machine_image
+    defaults:
+      run:
+        working-directory: ${{ matrix.module }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: 1.10.5
+      - name: Initialize providers but never remote state
+        run: terraform init -backend=false -input=false -no-color
+      - name: Validate the actual module rather than repository root
+        run: terraform validate -no-color
