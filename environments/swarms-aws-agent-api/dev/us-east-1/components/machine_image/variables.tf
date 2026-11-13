@@ -1,3 +1,5 @@
-variable test_server_count {
-  value = 1 # how many test servers to run
+variable "test_server_count" {
+  type        = number
+  description = "Opt-in instance count for a reviewed, explicitly approved infrastructure experiment"
+  default     = 0
 }
