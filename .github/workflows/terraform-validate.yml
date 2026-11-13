@@ -16,7 +16,6 @@ jobs:
       matrix:
         working-directory:
           - accounts/mdupont
-          - environments/swarms-aws-agent-api/dev/us-east-1
           - environments/swarms-aws-agent-api/dev/us-east-1/components/machine_image
     defaults:
       run:
