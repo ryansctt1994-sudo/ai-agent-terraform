@@ -1,3 +1,9 @@
+# Experimental recursive Terraform concept (not executable HCL)
+
+This file was previously named `main.tf`, where embedded Markdown prose and fenced examples prevented Terraform from parsing the environment. It is retained verbatim below for research reference, not deployment.
+
+---
+
 #task :break this up into subtasks we will call you back for each subtask with this large text.
 # meta terraform quine meme 
 # create a terraform module that will call you back with its text.
