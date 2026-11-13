@@ -1,0 +1,26 @@
+name: Offline Terraform Plan Policy Fixtures
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/check_plan_policy.py'
+      - 'tests/test_plan_policy.py'
+      - '.github/workflows/plan-policy-fixtures.yml'
+      - 'accounts/**/*.tf'
+      - 'environments/**/*.tf'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  policy-fixtures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run no-cloud/no-provider plan policy regression fixtures
+        run: python -m unittest discover -s tests -p 'test_plan_policy.py' -v
